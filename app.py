@@ -35,19 +35,21 @@ CSS = """
 }
 html, body, [class*="css"]  { font-family:'Inter', sans-serif; }
 
-/* ---------- animated aurora background ---------- */
-.stApp{ background:var(--bg); color:var(--ink); position:relative; overflow-x:hidden; }
-.stApp::before, .stApp::after{
-  content:""; position:fixed; border-radius:50%; filter:blur(90px); z-index:0; pointer-events:none;
+/* ---------- animated aurora background (safe: no fixed overlay blocking content) ---------- */
+.stApp{
+  background:
+    radial-gradient(circle at 10% -8%, rgba(244,162,97,0.16) 0%, transparent 38%),
+    radial-gradient(circle at 92% 8%, rgba(47,191,159,0.13) 0%, transparent 42%),
+    radial-gradient(circle at 30% 105%, rgba(91,141,239,0.10) 0%, transparent 45%),
+    var(--bg);
+  background-size: 200% 200%, 200% 200%, 200% 200%, auto;
+  animation: auroraShift 22s ease-in-out infinite;
+  color:var(--ink);
 }
-.stApp::before{ width:520px; height:520px; top:-160px; left:-120px;
-  background:radial-gradient(circle, rgba(244,162,97,0.24) 0%, transparent 70%);
-  animation: floatA 16s ease-in-out infinite; }
-.stApp::after{ width:600px; height:600px; bottom:-220px; right:-160px;
-  background:radial-gradient(circle, rgba(47,191,159,0.20) 0%, transparent 70%);
-  animation: floatB 20s ease-in-out infinite; }
-@keyframes floatA{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(60px,80px) scale(1.15);} }
-@keyframes floatB{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-70px,-50px) scale(1.1);} }
+@keyframes auroraShift{
+  0%,100%{ background-position: 0% 0%, 100% 0%, 30% 100%, 0 0; }
+  50%{ background-position: 15% 20%, 80% 25%, 45% 85%, 0 0; }
+}
 
 h1,h2,h3,h4{ font-family:'Space Grotesk', sans-serif !important; letter-spacing:-0.01em; }
 [data-testid="stMainBlockContainer"]{ padding-top:2rem; position:relative; z-index:1; }
@@ -254,7 +256,7 @@ with tab_overview:
             "missing": [overview["missing_values"][c] for c in overview["columns"]],
             "missing %": [overview["missing_pct"][c] for c in overview["columns"]],
         })
-        st.dataframe(dtype_df, height=380, use_container_width=True)
+        st.dataframe(dtype_df, height=380, width='stretch')
 
     with c2:
         st.subheader("Cleaning decisions")
@@ -273,7 +275,7 @@ with tab_overview:
 Full rationale is in **README.md**.
         """)
     st.subheader("Preview of cleaned data")
-    st.dataframe(f.head(20), use_container_width=True)
+    st.dataframe(f.head(20), width='stretch')
 
 # ---- TAB: Q1 traffic --------------------------------------------------------
 with tab_q1:
@@ -288,7 +290,7 @@ with tab_q1:
                  color=q1.index, color_discrete_map=TRAFFIC_COLOR, text=q1.values)
     fig.update_traces(texttemplate="%{text:.1f}", textposition="outside", showlegend=False)
     fig.update_layout(title="Average delivery time by traffic density", height=460)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width='stretch')
     st.download_button("⬇ Download this chart as HTML", fig.to_html(), "chart1_traffic.html")
 
 # ---- TAB: Q2 distance --------------------------------------------------------
@@ -307,14 +309,14 @@ with tab_q2:
                            labels={"distance_km": "Distance (km)", "Time_taken (min)": "Delivery time (min)"})
         fig2.update_traces(marker=dict(color="#2FBF9F", size=5))
         fig2.update_layout(title="Distance vs. delivery time", height=430)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, width='stretch')
     with c2:
         bucket = q2["avg_time_by_distance_bucket"]
         fig3 = px.bar(bucket, x=bucket.index, y=bucket.values, template=PLOTLY_TEMPLATE,
                       labels={"x": "Distance bucket", "y": "Avg delivery time (min)"}, text=bucket.values)
         fig3.update_traces(marker_color="#5B8DEF", texttemplate="%{text:.1f}", textposition="outside")
         fig3.update_layout(title="Average time by distance bucket", height=430)
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, width='stretch')
 
 # ---- TAB: Q3 combined --------------------------------------------------------
 with tab_q3:
@@ -328,9 +330,9 @@ with tab_q3:
     fig4 = px.imshow(pivot, text_auto=".1f", color_continuous_scale="Sunsetdark",
                       labels=dict(color="Avg min"), aspect="auto")
     fig4.update_layout(template=PLOTLY_TEMPLATE, title="Average delivery time (min): weather × traffic", height=480)
-    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig4, width='stretch')
     st.caption("Top 5 slowest combinations")
-    st.dataframe(A.q3_combined_conditions(f, top_n=5).rename("avg_minutes").reset_index(), use_container_width=True)
+    st.dataframe(A.q3_combined_conditions(f, top_n=5).rename("avg_minutes").reset_index(), width='stretch')
 
 # ---- TAB: Business insights --------------------------------------------------
 with tab_insights:
