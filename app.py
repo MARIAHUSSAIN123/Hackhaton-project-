@@ -34,15 +34,28 @@ CSS = """
   --amber:#F4A261; --teal:#2FBF9F; --red:#EF5B5B; --blue:#5B8DEF; --ink:#EAECEF; --sub:#8B93A3;
 }
 html, body, [class*="css"]  { font-family:'Inter', sans-serif; }
-.stApp{ background:
-    radial-gradient(circle at 12% -5%, rgba(244,162,97,0.10) 0%, transparent 40%),
-    radial-gradient(circle at 90% 10%, rgba(47,191,159,0.08) 0%, transparent 45%),
-    radial-gradient(circle at 50% 100%, rgba(91,141,239,0.06) 0%, transparent 50%),
-    var(--bg); color:var(--ink); }
-h1,h2,h3,h4{ font-family:'Space Grotesk', sans-serif !important; letter-spacing:-0.01em; }
-[data-testid="stMainBlockContainer"]{ padding-top:2rem; }
 
-/* dashed road divider — the signature element, gently animated like a moving lane line */
+/* ---------- animated aurora background ---------- */
+.stApp{ background:var(--bg); color:var(--ink); position:relative; overflow-x:hidden; }
+.stApp::before, .stApp::after{
+  content:""; position:fixed; border-radius:50%; filter:blur(90px); z-index:0; pointer-events:none;
+}
+.stApp::before{ width:520px; height:520px; top:-160px; left:-120px;
+  background:radial-gradient(circle, rgba(244,162,97,0.24) 0%, transparent 70%);
+  animation: floatA 16s ease-in-out infinite; }
+.stApp::after{ width:600px; height:600px; bottom:-220px; right:-160px;
+  background:radial-gradient(circle, rgba(47,191,159,0.20) 0%, transparent 70%);
+  animation: floatB 20s ease-in-out infinite; }
+@keyframes floatA{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(60px,80px) scale(1.15);} }
+@keyframes floatB{ 0%,100%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-70px,-50px) scale(1.1);} }
+
+h1,h2,h3,h4{ font-family:'Space Grotesk', sans-serif !important; letter-spacing:-0.01em; }
+[data-testid="stMainBlockContainer"]{ padding-top:2rem; position:relative; z-index:1; }
+
+/* entrance animation */
+@keyframes fadeInUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+/* dashed road divider — animated like a moving lane line */
 .roadline{ height:0; border-top:3px dashed var(--amber); opacity:.55; margin:0.4rem 0 1.4rem 0;
   background-size: 40px 3px; animation: drive 3s linear infinite; }
 @keyframes drive{ from{ background-position:0 0; } to{ background-position:-40px 0; } }
@@ -50,52 +63,72 @@ h1,h2,h3,h4{ font-family:'Space Grotesk', sans-serif !important; letter-spacing:
 /* hero */
 .hero-badge{ display:inline-block; padding:5px 14px; border-radius:999px; background:var(--panel2);
   border:1px solid var(--line); color:var(--amber); font-family:'JetBrains Mono',monospace; font-size:0.72rem;
-  letter-spacing:.08em; text-transform:uppercase; box-shadow:0 0 18px rgba(244,162,97,0.15); }
-.hero-title{ font-size:3rem; font-weight:800; margin:0.5rem 0 0.2rem 0; line-height:1.05;
-  background:linear-gradient(90deg, var(--ink) 55%, var(--amber) 120%);
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
-.hero-sub{ color:var(--sub); font-size:1.05rem; max-width:660px; line-height:1.55;}
+  letter-spacing:.08em; text-transform:uppercase; box-shadow:0 0 18px rgba(244,162,97,0.25);
+  animation: fadeInUp .6s ease both, glowPulse 2.4s ease-in-out infinite; }
+@keyframes glowPulse{ 0%,100%{ box-shadow:0 0 12px rgba(244,162,97,0.18);} 50%{ box-shadow:0 0 26px rgba(244,162,97,0.4);} }
+.hero-title{ font-size:3.1rem; font-weight:800; margin:0.5rem 0 0.2rem 0; line-height:1.05;
+  background:linear-gradient(100deg, var(--ink) 30%, var(--amber) 55%, var(--teal) 75%, var(--ink) 95%);
+  background-size:300% auto;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation: fadeInUp .7s ease .05s both, shimmer 7s linear infinite; }
+@keyframes shimmer{ to{ background-position:300% center; } }
+.hero-sub{ color:var(--sub); font-size:1.05rem; max-width:660px; line-height:1.55;
+  animation: fadeInUp .7s ease .12s both; }
 
-/* KPI ticket cards — glass + lift-on-hover + icon chip */
+/* KPI ticket cards — glass + 3D tilt + icon chip + staggered entrance */
 .kpi{ background:linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
   border:1px solid var(--line); border-radius:14px; padding:16px 18px 14px 18px; position:relative;
-  overflow:hidden; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+  overflow:hidden; transform-style:preserve-3d; perspective:600px;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  animation: fadeInUp .55s ease both; }
 .kpi::before{ content:""; position:absolute; inset:0 0 auto 0; height:3px;
   background:linear-gradient(90deg, var(--accent, var(--teal)), transparent 85%); }
-.kpi:hover{ transform:translateY(-3px); border-color:var(--accent, var(--teal));
-  box-shadow:0 10px 24px -8px rgba(0,0,0,0.5), 0 0 0 1px var(--accent, var(--teal)) inset; }
-.kpi-icon{ font-size:1.05rem; opacity:.85; margin-bottom:6px; display:block; }
-.kpi-label{ color:var(--sub); font-size:0.7rem; text-transform:uppercase; letter-spacing:.07em; font-family:'JetBrains Mono',monospace;}
-.kpi-value{ font-family:'Space Grotesk',sans-serif; font-size:1.7rem; font-weight:700; margin-top:3px; color:var(--ink);}
+.kpi::after{ content:""; position:absolute; inset:0; border-radius:14px; opacity:0; pointer-events:none;
+  background:radial-gradient(160px circle at 50% 0%, color-mix(in srgb, var(--accent, var(--teal)) 22%, transparent), transparent 70%);
+  transition:opacity .25s ease; }
+.kpi:hover{ transform:translateY(-5px) rotateX(3deg); border-color:var(--accent, var(--teal));
+  box-shadow:0 14px 30px -10px rgba(0,0,0,0.55), 0 0 0 1px var(--accent, var(--teal)) inset; }
+.kpi:hover::after{ opacity:1; }
+.kpi-icon{ font-size:1.15rem; opacity:.9; margin-bottom:6px; display:block;
+  filter:drop-shadow(0 0 6px color-mix(in srgb, var(--accent, var(--teal)) 60%, transparent)); }
+.kpi-label{ color:var(--sub); font-size:0.68rem; text-transform:uppercase; letter-spacing:.07em; font-family:'JetBrains Mono',monospace; white-space:nowrap; }
+.kpi-value{ font-family:'Space Grotesk',sans-serif; font-weight:700; margin-top:4px; color:var(--ink);
+  display:flex; align-items:baseline; gap:4px; white-space:nowrap; }
+.kpi-num{ font-size:1.55rem; }
+.kpi-unit{ font-size:0.85rem; font-weight:600; color:var(--sub); }
 
 /* insight card */
 .insight{ background:linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%); border:1px solid var(--line);
-  border-radius:14px; padding:20px 22px; margin-bottom:14px; transition:border-color .18s ease, transform .18s ease;}
-.insight:hover{ border-color:var(--amber); transform:translateY(-2px); }
+  border-radius:14px; padding:20px 22px; margin-bottom:14px; transition:border-color .18s ease, transform .18s ease;
+  animation: fadeInUp .5s ease both; }
+.insight:hover{ border-color:var(--amber); transform:translateY(-3px) scale(1.005); }
 .insight-title{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.08rem; color:var(--amber); margin-bottom:6px;}
 .insight-so{ color:var(--sub); font-size:0.92rem; border-top:1px dashed var(--line); margin-top:10px; padding-top:8px;}
 
 /* answer callout */
 .answer{ background:linear-gradient(135deg, rgba(47,191,159,0.14), rgba(91,141,239,0.08));
   border:1px solid var(--teal); border-radius:12px; padding:16px 20px; font-size:1.02rem; margin:10px 0 18px 0;
-  box-shadow:0 8px 24px -12px rgba(47,191,159,0.35); }
+  box-shadow:0 8px 24px -12px rgba(47,191,159,0.35); animation: fadeInUp .5s ease both; }
 
 section[data-testid="stSidebar"]{ background:linear-gradient(180deg, var(--panel) 0%, #171A21 100%);
   border-right:1px solid var(--line);}
 section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"]{ background:var(--panel2) !important;
-  border:1px solid var(--amber) !important; border-radius:999px !important; }
+  border:1px solid var(--amber) !important; border-radius:999px !important; transition:transform .15s ease; }
+section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"]:hover{ transform:translateY(-1px) scale(1.03); }
 
 .stTabs [data-baseweb="tab-list"]{ gap: 6px; border-bottom:1px solid var(--line); }
 .stTabs [data-baseweb="tab"]{ background:var(--panel); border-radius:10px 10px 0 0; padding:10px 18px;
-  color:var(--sub); transition:color .15s ease, background .15s ease; }
-.stTabs [data-baseweb="tab"]:hover{ color:var(--ink); background:var(--panel2); }
+  color:var(--sub); transition:color .2s ease, background .2s ease, transform .2s ease; }
+.stTabs [data-baseweb="tab"]:hover{ color:var(--ink); background:var(--panel2); transform:translateY(-2px); }
 .stTabs [aria-selected="true"]{ color:var(--amber) !important; background:var(--panel2) !important;
-  box-shadow:inset 0 -2px 0 var(--amber); }
+  box-shadow:inset 0 -3px 0 var(--amber); animation: tabPulse .4s ease; }
+@keyframes tabPulse{ from{ box-shadow:inset 0 -3px 0 transparent; } to{ box-shadow:inset 0 -3px 0 var(--amber); } }
 
 /* buttons */
 .stButton>button, .stDownloadButton>button{ border-radius:999px !important; border:1px solid var(--amber) !important;
-  color:var(--amber) !important; background:transparent !important; transition:.15s ease; }
-.stButton>button:hover, .stDownloadButton>button:hover{ background:var(--amber) !important; color:#12151B !important; }
+  color:var(--amber) !important; background:transparent !important; transition:.2s ease !important; }
+.stButton>button:hover, .stDownloadButton>button:hover{ background:var(--amber) !important; color:#12151B !important;
+  transform:translateY(-2px) scale(1.02); box-shadow:0 8px 20px -6px rgba(244,162,97,0.5) !important; }
 
 footer, #MainMenu {visibility:hidden;}
 </style>
@@ -180,20 +213,21 @@ st.markdown('<div class="roadline"></div>', unsafe_allow_html=True)
 # --------------------------------------------------------------------------- #
 stats = A.basic_stats(f.copy())
 kpi_defs = [
-    ("📦", "Deliveries", f"{stats['total_deliveries']:,}", "var(--teal)"),
-    ("⏱️", "Avg time", f"{stats['avg_delivery_time_min']} min", "var(--amber)"),
-    ("📏", "Avg distance", f"{stats['avg_distance_km']} km", "var(--blue)"),
-    ("⚡", "Avg speed", f"{stats['avg_speed_kmph']} km/h", "var(--red)"),
-    ("⭐", "Avg rating", f"{stats['avg_rating']} ★", "var(--teal)"),
-    ("🧑", "Avg rider age", f"{stats['avg_age']} yrs", "var(--amber)"),
+    ("📦", "Deliveries", f"{stats['total_deliveries']:,}", "", "var(--teal)"),
+    ("⏱️", "Avg time", f"{stats['avg_delivery_time_min']}", "min", "var(--amber)"),
+    ("📏", "Avg distance", f"{stats['avg_distance_km']}", "km", "var(--blue)"),
+    ("⚡", "Avg speed", f"{stats['avg_speed_kmph']}", "km/h", "var(--red)"),
+    ("⭐", "Avg rating", f"{stats['avg_rating']}", "★", "var(--teal)"),
+    ("🧑", "Avg rider age", f"{stats['avg_age']}", "yrs", "var(--amber)"),
 ]
 cols = st.columns(6)
-for c, (icon, label, val, accent) in zip(cols, kpi_defs):
+for i, (c, (icon, label, num, unit, accent)) in enumerate(zip(cols, kpi_defs)):
+    unit_html = f'<span class="kpi-unit">{unit}</span>' if unit else ""
     c.markdown(
-        f'<div class="kpi" style="--accent:{accent}">'
+        f'<div class="kpi" style="--accent:{accent}; animation-delay:{i*0.07:.2f}s">'
         f'<span class="kpi-icon">{icon}</span>'
         f'<div class="kpi-label">{label}</div>'
-        f'<div class="kpi-value">{val}</div></div>',
+        f'<div class="kpi-value"><span class="kpi-num">{num}</span>{unit_html}</div></div>',
         unsafe_allow_html=True,
     )
 
@@ -302,9 +336,9 @@ with tab_q3:
 with tab_insights:
     st.subheader("💡 Business insights")
     insights = A.business_insights(f.copy())
-    for ins in insights:
+    for i, ins in enumerate(insights):
         st.markdown(f"""
-<div class="insight">
+<div class="insight" style="animation-delay:{i*0.08:.2f}s">
   <div class="insight-title">{ins['title']}</div>
   <div>{ins['finding']}</div>
   <div class="insight-so"><b>So what:</b> {ins['so_what']}</div>
