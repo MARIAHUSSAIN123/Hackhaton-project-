@@ -133,6 +133,23 @@ section[data-testid="stSidebar"] .stMultiSelect [data-baseweb="tag"]:hover{ tran
   transform:translateY(-2px) scale(1.02); box-shadow:0 8px 20px -6px rgba(244,162,97,0.5) !important; }
 
 footer, #MainMenu {visibility:hidden;}
+
+/* AI explanation card */
+.ai-card{ background:linear-gradient(160deg, rgba(47,191,159,0.10), rgba(91,141,239,0.05) 60%), var(--panel);
+  border:1px solid var(--teal); border-radius:16px; padding:22px 26px; margin:14px 0 18px 0; position:relative;
+  box-shadow:0 12px 32px -14px rgba(47,191,159,0.4); animation: fadeInUp .5s ease both; }
+.ai-card-head{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.ai-avatar{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  font-size:1.2rem; background:linear-gradient(135deg, var(--teal), var(--blue)); box-shadow:0 0 16px rgba(47,191,159,0.5); }
+.ai-live{ display:inline-flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:0.7rem;
+  text-transform:uppercase; letter-spacing:.08em; color:var(--teal); }
+.ai-dot{ width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal);
+  animation: dotPulse 1.4s ease-in-out infinite; }
+@keyframes dotPulse{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:.4; transform:scale(0.7);} }
+.ai-provider{ color:var(--sub); font-size:0.8rem; margin-left:auto; font-family:'JetBrains Mono',monospace; }
+.ai-body p{ line-height:1.7; font-size:1.0rem; color:var(--ink); margin:0 0 12px 0;
+  animation: fadeInUp .45s ease both; opacity:0; }
+.ai-body p:last-child{ margin-bottom:0; }
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -348,21 +365,31 @@ with tab_insights:
         """, unsafe_allow_html=True)
 
 # ---- TAB: AI explanation ------------------------------------------------------
-# ---- TAB: AI explanation ------------------------------------------------------
 with tab_ai:
     st.subheader("🤖 AI-generated business explanation")
     st.caption("Python/Pandas already computed every number below — the model only turns them into plain-English narrative.")
     if st.button("✨ Generate explanation", type="primary"):
         insights = A.business_insights(f.copy())
-        q1d, q2d = A.q1_traffic_impact(f).to_dict(), A.q2_distance_impact(f)
-        q3d = {f"{w} + {t}": v for (w, t), v in A.q3_combined_conditions(f).items()}
+        q1d, q2d, q3d = A.q1_traffic_impact(f).to_dict(), A.q2_distance_impact(f), A.q3_combined_conditions(f).to_dict()
         q2_payload = {"correlation": q2d["correlation"],
                       "avg_time_by_distance_bucket": q2d["avg_time_by_distance_bucket"].to_dict()}
         try:
             with st.spinner(f"Asking {provider}..."):
                 text = AI.generate_explanation(stats, q1d, q2_payload, q3d, insights, provider=provider)
-            st.success("Generated live by the model:")
-            st.write(text)
+            paragraphs = [p.strip() for p in text.strip().split("\n") if p.strip()]
+            paras_html = "".join(
+                f'<p style="animation-delay:{i*0.12:.2f}s">{p}</p>' for i, p in enumerate(paragraphs)
+            )
+            st.markdown(f"""
+<div class="ai-card">
+  <div class="ai-card-head">
+    <div class="ai-avatar">🤖</div>
+    <span class="ai-live"><span class="ai-dot"></span>Live model response</span>
+    <span class="ai-provider">{provider}</span>
+  </div>
+  <div class="ai-body">{paras_html}</div>
+</div>
+            """, unsafe_allow_html=True)
         except Exception as e:
             st.warning(AI.FALLBACK_EXPLANATION_NOTE)
             st.code(str(e))
