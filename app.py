@@ -353,7 +353,8 @@ with tab_ai:
     st.caption("Python/Pandas already computed every number below — the model only turns them into plain-English narrative.")
     if st.button("✨ Generate explanation", type="primary"):
         insights = A.business_insights(f.copy())
-        q1d, q2d, q3d = A.q1_traffic_impact(f).to_dict(), A.q2_distance_impact(f), A.q3_combined_conditions(f).to_dict()
+q1d, q2d = A.q1_traffic_impact(f).to_dict(), A.q2_distance_impact(f)
+q3d = {f"{w} + {t}": v for (w, t), v in A.q3_combined_conditions(f).items()}
         q2_payload = {"correlation": q2d["correlation"],
                       "avg_time_by_distance_bucket": q2d["avg_time_by_distance_bucket"].to_dict()}
         try:
