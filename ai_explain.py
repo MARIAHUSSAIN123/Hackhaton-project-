@@ -70,7 +70,7 @@ def explain_with_openai(prompt: str, model: str = "gpt-4o-mini") -> str:
     return resp.choices[0].message.content
 
 
-def explain_with_groq(prompt: str, model: str = "llama-3.1-8b-instant") -> str:
+def explain_with_groq(prompt: str, model: str = "openai/gpt-oss-20b") -> str:
     from groq import Groq
     api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
