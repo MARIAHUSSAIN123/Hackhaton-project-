@@ -52,7 +52,7 @@ html, body, [class*="css"]  { font-family:'Inter', sans-serif; }
 }
 
 h1,h2,h3,h4{ font-family:'Space Grotesk', sans-serif !important; letter-spacing:-0.01em; }
-[data-testid="stMainBlockContainer"]{ padding-top:2rem; position:relative; z-index:1; }
+[data-testid="stMainBlockContainer"]{ padding-top:4.5rem; position:relative; z-index:1; }
 
 /* entrance animation */
 @keyframes fadeInUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
