@@ -50,7 +50,7 @@ def explain_with_anthropic(prompt: str, model: str = "claude-sonnet-4-5-20250929
     client = anthropic.Anthropic(api_key=api_key)
     resp = client.messages.create(
         model=model,
-        max_tokens=500,
+        max_tokens=750,
         messages=[{"role": "user", "content": prompt}],
     )
     return resp.content[0].text
@@ -65,7 +65,7 @@ def explain_with_openai(prompt: str, model: str = "gpt-4o-mini") -> str:
     resp = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=500,
+        max_tokens=750,
     )
     return resp.choices[0].message.content
 
@@ -79,7 +79,7 @@ def explain_with_groq(prompt: str, model: str = "openai/gpt-oss-20b") -> str:
     resp = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=500,
+        max_tokens=750,
     )
     return resp.choices[0].message.content
 
