@@ -18,14 +18,29 @@ import os
 import json
 
 
+def _sanitize_keys(obj):
+    """Recursively convert non-JSON-safe dict keys (e.g. tuples from a
+    MultiIndex .to_dict(), such as ('Fog', 'Jam')) into plain strings so
+    json.dumps never chokes on them. Values are left untouched (json.dumps'
+    default=str handles any remaining non-serializable values)."""
+    if isinstance(obj, dict):
+        return {
+            (" + ".join(str(part) for part in k) if isinstance(k, tuple) else k): _sanitize_keys(v)
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_sanitize_keys(v) for v in obj]
+    return obj
+
+
 def _build_prompt(stats: dict, q1: dict, q2: dict, q3: dict, insights: list[dict]) -> str:
-    payload = {
+    payload = _sanitize_keys({
         "overall_stats": stats,
         "avg_delivery_time_by_traffic": q1,
         "distance_vs_time": q2,
         "worst_weather_traffic_combos": q3,
         "insights_already_identified": [i["title"] for i in insights],
-    }
+    })
     return f"""You are a data analyst explaining results to a non-technical food-delivery
 business audience. Below is JSON containing numbers ALREADY calculated with
 Python/Pandas. Do not invent any new numbers — only explain the ones given.
