@@ -151,6 +151,21 @@ footer, #MainMenu {visibility:hidden;}
 .ai-body p{ line-height:1.7; font-size:1.0rem; color:var(--ink); margin:0 0 12px 0;
   animation: fadeInUp .45s ease both; opacity:0; }
 .ai-body p:last-child{ margin-bottom:0; }
+
+/* ---------- chat tab: nicer bubbles ---------- */
+[data-testid="stChatMessage"]{
+  background:linear-gradient(180deg, var(--panel) 0%, var(--panel2) 100%);
+  border:1px solid var(--line); border-radius:16px; padding:6px 6px;
+  margin-bottom:10px; animation: fadeInUp .35s ease both;
+  box-shadow:0 6px 18px -10px rgba(0,0,0,0.5);
+}
+[data-testid="stChatMessage"]:has(img[alt="🧑"]){ border-color: var(--blue); }
+[data-testid="stChatMessage"]:has(img[alt="🤖"]){ border-color: var(--teal); }
+[data-testid="stChatInput"] textarea{
+  background:var(--panel2) !important; border:1px solid var(--line) !important;
+  border-radius:14px !important; color:var(--ink) !important;
+}
+[data-testid="stChatInput"]{ border-radius:14px !important; }
 </style>
 """
 st.markdown(CSS, unsafe_allow_html=True)
@@ -436,15 +451,14 @@ with tab_chat:
 
         with st.chat_message("assistant", avatar="🤖"):
             with st.spinner(f"Asking {provider}..."):
-                try:
-                    reply = CB.ask(
-                        user_q,
-                        st.session_state.chat_history[:-1],  # history before this question
-                        f,  # currently filtered dataframe
-                        provider=provider,
-                    )
-                except Exception as e:
-                    reply = CB.NO_KEY_FALLBACK + f"\n\n`{e}`"
+                # CB.ask() never raises -- it returns a friendly message on any
+                # failure (missing key, network issue, bad SDK response, etc.)
+                reply = CB.ask(
+                    user_q,
+                    st.session_state.chat_history[:-1],  # history before this question
+                    f,  # currently filtered dataframe
+                    provider=provider,
+                )
             st.markdown(reply)
         st.session_state.chat_history.append({"role": "assistant", "content": reply})
 
