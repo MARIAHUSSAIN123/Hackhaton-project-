@@ -1,11 +1,18 @@
 """
 Food Delivery Analytics Challenge — Streamlit Dashboard
-=========================================================
-Run locally:   streamlit run app.py
-Deploy free:   push this repo to GitHub -> streamlit.io/cloud -> New app
+========================================================
+
+Run locally:
+    streamlit run app.py
+
+Deploy:
+    Push this repo to GitHub
+    -> streamlit.io/cloud
+    -> New app
 """
 
 import os
+
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -16,9 +23,9 @@ import analysis as A
 import ai_explain as AI
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # PAGE CONFIG + THEME
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 st.set_page_config(
     page_title="RouteWise · Delivery Analytics",
@@ -33,121 +40,208 @@ CSS = """
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap');
 
-:root{
-  --bg:#0E1015;
-  --panel:#1B1F27;
-  --panel2:#20242E;
-  --line:#2B303B;
-  --amber:#F4A261;
-  --teal:#2FBF9F;
-  --red:#EF5B5B;
-  --blue:#5B8DEF;
-  --ink:#EAECEF;
-  --sub:#8B93A3;
+
+/* ============================================================
+   ROOT VARIABLES
+   ============================================================ */
+
+:root {
+    --bg: #0E1015;
+    --panel: #1B1F27;
+    --panel2: #20242E;
+    --line: #2B303B;
+
+    --amber: #F4A261;
+    --teal: #2FBF9F;
+    --red: #EF5B5B;
+    --blue: #5B8DEF;
+
+    --ink: #EAECEF;
+    --sub: #8B93A3;
 }
 
-html, body, [class*="css"] {
-    font-family:'Inter', sans-serif;
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+
+html,
+body,
+[class*="css"] {
+    font-family: "Inter", sans-serif;
 }
 
-.stApp{
-  background:
-    radial-gradient(circle at 10% -8%, rgba(244,162,97,0.16) 0%, transparent 38%),
-    radial-gradient(circle at 92% 8%, rgba(47,191,159,0.13) 0%, transparent 42%),
-    radial-gradient(circle at 30% 105%, rgba(91,141,239,0.10) 0%, transparent 45%),
-    var(--bg);
-  background-size: 200% 200%, 200% 200%, 200% 200%, auto;
-  animation: auroraShift 22s ease-in-out infinite;
-  color:var(--ink);
+
+.stApp {
+    background:
+        radial-gradient(
+            circle at 10% -8%,
+            rgba(244, 162, 97, 0.16) 0%,
+            transparent 38%
+        ),
+        radial-gradient(
+            circle at 92% 8%,
+            rgba(47, 191, 159, 0.13) 0%,
+            transparent 42%
+        ),
+        radial-gradient(
+            circle at 30% 105%,
+            rgba(91, 141, 239, 0.10) 0%,
+            transparent 45%
+        ),
+        var(--bg);
+
+    background-size:
+        200% 200%,
+        200% 200%,
+        200% 200%,
+        auto;
+
+    animation: auroraShift 22s ease-in-out infinite;
+
+    color: var(--ink);
 }
 
-@keyframes auroraShift{
-  0%,100%{
-    background-position:0% 0%, 100% 0%, 30% 100%, 0 0;
-  }
 
-  50%{
-    background-position:15% 20%, 80% 25%, 45% 85%, 0 0;
-  }
-}
+@keyframes auroraShift {
 
-h1,h2,h3,h4{
-    font-family:'Space Grotesk', sans-serif !important;
-    letter-spacing:-0.01em;
-}
-
-[data-testid="stMainBlockContainer"]{
-    padding-top:4.5rem;
-    position:relative;
-    z-index:1;
-}
-
-@keyframes fadeInUp{
-    from{
-        opacity:0;
-        transform:translateY(14px);
+    0%,
+    100% {
+        background-position:
+            0% 0%,
+            100% 0%,
+            30% 100%,
+            0 0;
     }
 
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-}
-
-.roadline{
-    height:0;
-    border-top:3px dashed var(--amber);
-    opacity:.55;
-    margin:0.4rem 0 1.4rem 0;
-    background-size:40px 3px;
-    animation:drive 3s linear infinite;
-}
-
-@keyframes drive{
-    from{
-        background-position:0 0;
-    }
-
-    to{
-        background-position:-40px 0;
+    50% {
+        background-position:
+            15% 20%,
+            80% 25%,
+            45% 85%,
+            0 0;
     }
 }
 
 
-/* HERO */
+h1,
+h2,
+h3,
+h4 {
+    font-family: "Space Grotesk", sans-serif !important;
+    letter-spacing: -0.01em;
+}
 
-.hero-badge{
-    display:inline-block;
-    padding:5px 14px;
-    border-radius:999px;
-    background:var(--panel2);
-    border:1px solid var(--line);
-    color:var(--amber);
-    font-family:'JetBrains Mono',monospace;
-    font-size:0.72rem;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    box-shadow:0 0 18px rgba(244,162,97,0.25);
+
+[data-testid="stMainBlockContainer"] {
+    padding-top: 4.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+
+@keyframes fadeInUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+
+/* ============================================================
+   ROAD LINE
+   ============================================================ */
+
+.roadline {
+    height: 0;
+    border-top: 3px dashed var(--amber);
+    opacity: 0.55;
+    margin: 0.4rem 0 1.4rem 0;
+
+    background-size: 40px 3px;
+
+    animation: drive 3s linear infinite;
+}
+
+
+@keyframes drive {
+
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -40px 0;
+    }
+
+}
+
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.hero-badge {
+    display: inline-block;
+
+    padding: 5px 14px;
+
+    border-radius: 999px;
+
+    background: var(--panel2);
+
+    border: 1px solid var(--line);
+
+    color: var(--amber);
+
+    font-family: "JetBrains Mono", monospace;
+
+    font-size: 0.72rem;
+
+    letter-spacing: 0.08em;
+
+    text-transform: uppercase;
+
+    box-shadow:
+        0 0 18px rgba(244, 162, 97, 0.25);
+
     animation:
-        fadeInUp .6s ease both,
+        fadeInUp 0.6s ease both,
         glowPulse 2.4s ease-in-out infinite;
 }
 
-@keyframes glowPulse{
-    0%,100%{
-        box-shadow:0 0 12px rgba(244,162,97,0.18);
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        box-shadow:
+            0 0 12px rgba(244, 162, 97, 0.18);
     }
 
-    50%{
-        box-shadow:0 0 26px rgba(244,162,97,0.4);
+    50% {
+        box-shadow:
+            0 0 26px rgba(244, 162, 97, 0.4);
     }
+
 }
 
-.hero-title{
-    font-size:3.1rem;
-    font-weight:800;
-    margin:0.5rem 0 0.2rem 0;
-    line-height:1.05;
+
+.hero-title {
+    font-size: 3.1rem;
+
+    font-weight: 800;
+
+    margin: 0.5rem 0 0.2rem 0;
+
+    line-height: 1.05;
 
     background:
         linear-gradient(
@@ -158,35 +252,47 @@ h1,h2,h3,h4{
             var(--ink) 95%
         );
 
-    background-size:300% auto;
+    background-size: 300% auto;
 
-    -webkit-background-clip:text;
-    background-clip:text;
-    -webkit-text-fill-color:transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+
+    -webkit-text-fill-color: transparent;
 
     animation:
-        fadeInUp .7s ease .05s both,
+        fadeInUp 0.7s ease 0.05s both,
         shimmer 7s linear infinite;
 }
 
-@keyframes shimmer{
-    to{
-        background-position:300% center;
+
+@keyframes shimmer {
+
+    to {
+        background-position: 300% center;
     }
-}
 
-.hero-sub{
-    color:var(--sub);
-    font-size:1.05rem;
-    max-width:660px;
-    line-height:1.55;
-    animation:fadeInUp .7s ease .12s both;
 }
 
 
-/* KPI */
+.hero-sub {
+    color: var(--sub);
 
-.kpi{
+    font-size: 1.05rem;
+
+    max-width: 660px;
+
+    line-height: 1.55;
+
+    animation:
+        fadeInUp 0.7s ease 0.12s both;
+}
+
+
+/* ============================================================
+   KPI CARDS
+   ============================================================ */
+
+.kpi {
     background:
         linear-gradient(
             180deg,
@@ -194,28 +300,38 @@ h1,h2,h3,h4{
             var(--panel2) 100%
         );
 
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:16px 18px 14px 18px;
-    position:relative;
-    overflow:hidden;
+    border: 1px solid var(--line);
 
-    transform-style:preserve-3d;
-    perspective:600px;
+    border-radius: 14px;
+
+    padding: 16px 18px 14px 18px;
+
+    position: relative;
+
+    overflow: hidden;
+
+    transform-style: preserve-3d;
+
+    perspective: 600px;
 
     transition:
-        transform .25s ease,
-        box-shadow .25s ease,
-        border-color .25s ease;
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
 
-    animation:fadeInUp .55s ease both;
+    animation:
+        fadeInUp 0.55s ease both;
 }
 
-.kpi::before{
-    content:"";
-    position:absolute;
-    inset:0 0 auto 0;
-    height:3px;
+
+.kpi::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0 0 auto 0;
+
+    height: 3px;
 
     background:
         linear-gradient(
@@ -225,96 +341,85 @@ h1,h2,h3,h4{
         );
 }
 
-.kpi::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:14px;
-    opacity:0;
-    pointer-events:none;
 
-    background:
-        radial-gradient(
-            160px circle at 50% 0%,
-            color-mix(
-                in srgb,
-                var(--accent, var(--teal)) 22%,
-                transparent
-            ),
-            transparent 70%
-        );
-
-    transition:opacity .25s ease;
-}
-
-.kpi:hover{
-    transform:translateY(-5px) rotateX(3deg);
+.kpi:hover {
+    transform:
+        translateY(-5px)
+        rotateX(3deg);
 
     border-color:
         var(--accent, var(--teal));
 
     box-shadow:
-        0 14px 30px -10px rgba(0,0,0,0.55),
+        0 14px 30px -10px rgba(0, 0, 0, 0.55),
         0 0 0 1px var(--accent, var(--teal)) inset;
 }
 
-.kpi:hover::after{
-    opacity:1;
-}
 
-.kpi-icon{
-    font-size:1.15rem;
-    opacity:.9;
-    margin-bottom:6px;
-    display:block;
+.kpi-icon {
+    font-size: 1.15rem;
 
-    filter:
-        drop-shadow(
-            0 0 6px
-            color-mix(
-                in srgb,
-                var(--accent, var(--teal)) 60%,
-                transparent
-            )
-        );
-}
+    opacity: 0.9;
 
-.kpi-label{
-    color:var(--sub);
-    font-size:0.68rem;
-    text-transform:uppercase;
-    letter-spacing:.07em;
-    font-family:'JetBrains Mono',monospace;
-    white-space:nowrap;
-}
+    margin-bottom: 6px;
 
-.kpi-value{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    margin-top:4px;
-    color:var(--ink);
-
-    display:flex;
-    align-items:baseline;
-    gap:4px;
-
-    white-space:nowrap;
-}
-
-.kpi-num{
-    font-size:1.55rem;
-}
-
-.kpi-unit{
-    font-size:0.85rem;
-    font-weight:600;
-    color:var(--sub);
+    display: block;
 }
 
 
-/* INSIGHTS */
+.kpi-label {
+    color: var(--sub);
 
-.insight{
+    font-size: 0.68rem;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.07em;
+
+    font-family: "JetBrains Mono", monospace;
+
+    white-space: nowrap;
+}
+
+
+.kpi-value {
+    font-family: "Space Grotesk", sans-serif;
+
+    font-weight: 700;
+
+    margin-top: 4px;
+
+    color: var(--ink);
+
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 4px;
+
+    white-space: nowrap;
+}
+
+
+.kpi-num {
+    font-size: 1.55rem;
+}
+
+
+.kpi-unit {
+    font-size: 0.85rem;
+
+    font-weight: 600;
+
+    color: var(--sub);
+}
+
+
+/* ============================================================
+   INSIGHTS
+   ============================================================ */
+
+.insight {
     background:
         linear-gradient(
             180deg,
@@ -322,69 +427,94 @@ h1,h2,h3,h4{
             var(--panel2) 100%
         );
 
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:20px 22px;
-    margin-bottom:14px;
+    border: 1px solid var(--line);
+
+    border-radius: 14px;
+
+    padding: 20px 22px;
+
+    margin-bottom: 14px;
 
     transition:
-        border-color .18s ease,
-        transform .18s ease;
+        border-color 0.18s ease,
+        transform 0.18s ease;
 
-    animation:fadeInUp .5s ease both;
-}
-
-.insight:hover{
-    border-color:var(--amber);
-    transform:translateY(-3px) scale(1.005);
-}
-
-.insight-title{
-    font-family:'Space Grotesk',sans-serif;
-    font-weight:700;
-    font-size:1.08rem;
-    color:var(--amber);
-    margin-bottom:6px;
-}
-
-.insight-so{
-    color:var(--sub);
-    font-size:0.92rem;
-    border-top:1px dashed var(--line);
-    margin-top:10px;
-    padding-top:8px;
+    animation:
+        fadeInUp 0.5s ease both;
 }
 
 
-/* ANSWER */
+.insight:hover {
+    border-color: var(--amber);
 
-.answer{
+    transform:
+        translateY(-3px)
+        scale(1.005);
+}
+
+
+.insight-title {
+    font-family: "Space Grotesk", sans-serif;
+
+    font-weight: 700;
+
+    font-size: 1.08rem;
+
+    color: var(--amber);
+
+    margin-bottom: 6px;
+}
+
+
+.insight-so {
+    color: var(--sub);
+
+    font-size: 0.92rem;
+
+    border-top: 1px dashed var(--line);
+
+    margin-top: 10px;
+
+    padding-top: 8px;
+}
+
+
+/* ============================================================
+   ANSWER BOX
+   ============================================================ */
+
+.answer {
     background:
         linear-gradient(
             135deg,
-            rgba(47,191,159,0.14),
-            rgba(91,141,239,0.08)
+            rgba(47, 191, 159, 0.14),
+            rgba(91, 141, 239, 0.08)
         );
 
-    border:1px solid var(--teal);
-    border-radius:12px;
+    border: 1px solid var(--teal);
 
-    padding:16px 20px;
+    border-radius: 12px;
 
-    font-size:1.02rem;
-    margin:10px 0 18px 0;
+    padding: 16px 20px;
+
+    font-size: 1.02rem;
+
+    margin: 10px 0 18px 0;
 
     box-shadow:
         0 8px 24px -12px
-        rgba(47,191,159,0.35);
+        rgba(47, 191, 159, 0.35);
 
-    animation:fadeInUp .5s ease both;
+    animation:
+        fadeInUp 0.5s ease both;
 }
 
 
-/* SIDEBAR */
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
 
-section[data-testid="stSidebar"]{
+section[data-testid="stSidebar"] {
     background:
         linear-gradient(
             180deg,
@@ -392,23 +522,28 @@ section[data-testid="stSidebar"]{
             #171A21 100%
         );
 
-    border-right:1px solid var(--line);
+    border-right: 1px solid var(--line);
 }
+
 
 section[data-testid="stSidebar"]
 .stMultiSelect
-[data-baseweb="tag"]{
+[data-baseweb="tag"] {
 
-    background:var(--panel2) !important;
-    border:1px solid var(--amber) !important;
-    border-radius:999px !important;
+    background: var(--panel2) !important;
 
-    transition:transform .15s ease;
+    border: 1px solid var(--amber) !important;
+
+    border-radius: 999px !important;
+
+    transition:
+        transform 0.15s ease;
 }
+
 
 section[data-testid="stSidebar"]
 .stMultiSelect
-[data-baseweb="tag"]:hover{
+[data-baseweb="tag"]:hover {
 
     transform:
         translateY(-1px)
@@ -416,60 +551,76 @@ section[data-testid="stSidebar"]
 }
 
 
-/* TABS */
+/* ============================================================
+   TABS
+   ============================================================ */
 
-.stTabs [data-baseweb="tab-list"]{
-    gap:6px;
-    border-bottom:1px solid var(--line);
+.stTabs [data-baseweb="tab-list"] {
+
+    gap: 6px;
+
+    border-bottom:
+        1px solid var(--line);
+
 }
 
-.stTabs [data-baseweb="tab"]{
-    background:var(--panel);
-    border-radius:10px 10px 0 0;
-    padding:10px 18px;
-    color:var(--sub);
+
+.stTabs [data-baseweb="tab"] {
+
+    background:
+        var(--panel);
+
+    border-radius:
+        10px 10px 0 0;
+
+    padding:
+        10px 18px;
+
+    color:
+        var(--sub);
 
     transition:
-        color .2s ease,
-        background .2s ease,
-        transform .2s ease;
+        color 0.2s ease,
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
-.stTabs [data-baseweb="tab"]:hover{
-    color:var(--ink);
-    background:var(--panel2);
-    transform:translateY(-2px);
+
+.stTabs [data-baseweb="tab"]:hover {
+
+    color:
+        var(--ink);
+
+    background:
+        var(--panel2);
+
+    transform:
+        translateY(-2px);
 }
 
-.stTabs [aria-selected="true"]{
-    color:var(--amber) !important;
-    background:var(--panel2) !important;
+
+.stTabs [aria-selected="true"] {
+
+    color:
+        var(--amber) !important;
+
+    background:
+        var(--panel2) !important;
 
     box-shadow:
         inset 0 -3px 0 var(--amber);
-
-    animation:tabPulse .4s ease;
-}
-
-@keyframes tabPulse{
-    from{
-        box-shadow:
-            inset 0 -3px 0 transparent;
-    }
-
-    to{
-        box-shadow:
-            inset 0 -3px 0 var(--amber);
-    }
 }
 
 
-/* BUTTONS */
+/* ============================================================
+   BUTTONS
+   ============================================================ */
 
-.stButton>button,
-.stDownloadButton>button{
+.stButton > button,
+.stDownloadButton > button {
 
-    border-radius:999px !important;
+    border-radius:
+        999px !important;
 
     border:
         1px solid var(--amber) !important;
@@ -481,16 +632,18 @@ section[data-testid="stSidebar"]
         transparent !important;
 
     transition:
-        .2s ease !important;
+        0.2s ease !important;
 }
 
-.stButton>button:hover,
-.stDownloadButton>button:hover{
+
+.stButton > button:hover,
+.stDownloadButton > button:hover {
 
     background:
         var(--amber) !important;
 
-    color:#12151B !important;
+    color:
+        #12151B !important;
 
     transform:
         translateY(-2px)
@@ -498,59 +651,86 @@ section[data-testid="stSidebar"]
 
     box-shadow:
         0 8px 20px -6px
-        rgba(244,162,97,0.5) !important;
+        rgba(244, 162, 97, 0.5) !important;
 }
 
 
-footer,
-#MainMenu{
-    visibility:hidden;
-}
+/* ============================================================
+   AI EXPLANATION
+   ============================================================ */
 
+.ai-card {
 
-/* AI EXPLANATION */
-
-.ai-card{
     background:
         linear-gradient(
             160deg,
-            rgba(47,191,159,0.10),
-            rgba(91,141,239,0.05) 60%
+            rgba(47, 191, 159, 0.10),
+            rgba(91, 141, 239, 0.05) 60%
         ),
         var(--panel);
 
-    border:1px solid var(--teal);
-    border-radius:16px;
+    border:
+        1px solid var(--teal);
 
-    padding:22px 26px;
-    margin:14px 0 18px 0;
+    border-radius:
+        16px;
 
-    position:relative;
+    padding:
+        22px 26px;
+
+    margin:
+        14px 0 18px 0;
+
+    position:
+        relative;
 
     box-shadow:
         0 12px 32px -14px
-        rgba(47,191,159,0.4);
+        rgba(47, 191, 159, 0.4);
 
-    animation:fadeInUp .5s ease both;
+    animation:
+        fadeInUp 0.5s ease both;
 }
 
-.ai-card-head{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:14px;
+
+.ai-card-head {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    margin-bottom:
+        14px;
 }
 
-.ai-avatar{
-    width:38px;
-    height:38px;
-    border-radius:50%;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+.ai-avatar {
 
-    font-size:1.2rem;
+    width:
+        38px;
+
+    height:
+        38px;
+
+    border-radius:
+        50%;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        1.2rem;
 
     background:
         linear-gradient(
@@ -561,29 +741,52 @@ footer,
 
     box-shadow:
         0 0 16px
-        rgba(47,191,159,0.5);
+        rgba(47, 191, 159, 0.5);
 }
 
-.ai-live{
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
 
-    font-family:'JetBrains Mono',monospace;
-    font-size:0.7rem;
+.ai-live {
 
-    text-transform:uppercase;
-    letter-spacing:.08em;
+    display:
+        inline-flex;
 
-    color:var(--teal);
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+
+    font-size:
+        0.7rem;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.08em;
+
+    color:
+        var(--teal);
 }
 
-.ai-dot{
-    width:7px;
-    height:7px;
-    border-radius:50%;
 
-    background:var(--teal);
+.ai-dot {
+
+    width:
+        7px;
+
+    height:
+        7px;
+
+    border-radius:
+        50%;
+
+    background:
+        var(--teal);
 
     box-shadow:
         0 0 8px var(--teal);
@@ -593,109 +796,270 @@ footer,
         ease-in-out infinite;
 }
 
-@keyframes dotPulse{
-    0%,100%{
-        opacity:1;
-        transform:scale(1);
+
+@keyframes dotPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+
+        transform:
+            scale(1);
     }
 
-    50%{
-        opacity:.4;
-        transform:scale(0.7);
+    50% {
+        opacity: 0.4;
+
+        transform:
+            scale(0.7);
     }
-}
 
-.ai-provider{
-    color:var(--sub);
-    font-size:0.8rem;
-    margin-left:auto;
-    font-family:'JetBrains Mono',monospace;
-}
-
-.ai-body p{
-    line-height:1.7;
-    font-size:1.0rem;
-    color:var(--ink);
-    margin:0 0 12px 0;
-
-    animation:fadeInUp .45s ease both;
-    opacity:0;
-}
-
-.ai-body p:last-child{
-    margin-bottom:0;
 }
 
 
-/* CHATBOT */
+.ai-provider {
 
-.chat-header{
+    color:
+        var(--sub);
+
+    font-size:
+        0.8rem;
+
+    margin-left:
+        auto;
+
+    font-family:
+        "JetBrains Mono",
+        monospace;
+}
+
+
+.ai-body p {
+
+    line-height:
+        1.7;
+
+    font-size:
+        1rem;
+
+    color:
+        var(--ink);
+
+    margin:
+        0 0 12px 0;
+
+}
+
+
+.ai-body p:last-child {
+
+    margin-bottom:
+        0;
+
+}
+
+
+/* ============================================================
+   CHATBOT HEADER
+   ============================================================ */
+
+.chat-header {
+
     background:
         linear-gradient(
             135deg,
-            rgba(47,191,159,.14),
-            rgba(91,141,239,.12)
+            rgba(47, 191, 159, 0.14),
+            rgba(91, 141, 239, 0.12)
         );
 
-    border:1px solid var(--teal);
-    border-radius:18px;
+    border:
+        1px solid var(--teal);
 
-    padding:22px 24px;
-    margin-bottom:18px;
+    border-radius:
+        18px;
+
+    padding:
+        22px 24px;
+
+    margin-bottom:
+        18px;
 
     box-shadow:
         0 12px 35px -18px
-        rgba(47,191,159,.6);
+        rgba(47, 191, 159, 0.6);
 }
 
-.chat-title{
-    font-family:'Space Grotesk',sans-serif;
-    font-size:1.5rem;
-    font-weight:700;
+
+.chat-title {
+
+    font-family:
+        "Space Grotesk",
+        sans-serif;
+
+    font-size:
+        1.5rem;
+
+    font-weight:
+        700;
 }
 
-.chat-subtitle{
-    color:var(--sub);
-    margin-top:4px;
-    font-size:.9rem;
+
+.chat-subtitle {
+
+    color:
+        var(--sub);
+
+    margin-top:
+        4px;
+
+    font-size:
+        0.9rem;
 }
 
-.chat-info{
-    background:var(--panel);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:12px 16px;
-    margin-bottom:15px;
-    color:var(--sub);
-    font-size:.85rem;
+
+.chat-info {
+
+    background:
+        var(--panel);
+
+    border:
+        1px solid var(--line);
+
+    border-radius:
+        12px;
+
+    padding:
+        12px 16px;
+
+    margin-bottom:
+        15px;
+
+    color:
+        var(--sub);
+
+    font-size:
+        0.85rem;
+}
+
+
+/* ============================================================
+   CHAT MESSAGES
+   ============================================================ */
+
+[data-testid="stChatMessage"] {
+
+    border-radius:
+        14px;
+
+    margin-bottom:
+        10px;
+}
+
+
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+
+    line-height:
+        1.65;
+}
+
+
+/* ============================================================
+   CHAT INPUT
+   ============================================================ */
+
+[data-testid="stChatInput"] {
+
+    border:
+        1px solid var(--teal) !important;
+
+    border-radius:
+        18px !important;
+
+    background:
+        var(--panel) !important;
+
+    box-shadow:
+        0 0 22px
+        rgba(47, 191, 159, 0.12);
+}
+
+
+[data-testid="stChatInput"] textarea {
+
+    color:
+        var(--ink) !important;
+}
+
+
+/* ============================================================
+   EXAMPLE QUESTION BUTTONS
+   ============================================================ */
+
+.example-question button {
+
+    min-height:
+        52px !important;
+
+    text-align:
+        left !important;
+
+    white-space:
+        normal !important;
+
+    border-radius:
+        12px !important;
+}
+
+
+/* ============================================================
+   HIDE STREAMLIT DEFAULT UI
+   ============================================================ */
+
+footer,
+#MainMenu {
+
+    visibility:
+        hidden;
+
 }
 
 </style>
 """
 
-st.markdown(CSS, unsafe_allow_html=True)
+
+st.markdown(
+    CSS,
+    unsafe_allow_html=True
+)
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # PLOTLY THEME
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 PLOTLY_TEMPLATE = go.layout.Template(
+
     layout=dict(
+
         paper_bgcolor="#1B1F27",
+
         plot_bgcolor="#1B1F27",
+
         font=dict(
             color="#EAECEF",
             family="Inter"
         ),
+
         xaxis=dict(
             gridcolor="#2B303B",
             zerolinecolor="#2B303B"
         ),
+
         yaxis=dict(
             gridcolor="#2B303B",
             zerolinecolor="#2B303B"
         ),
+
         colorway=[
             "#2FBF9F",
             "#F4A261",
@@ -704,21 +1068,28 @@ PLOTLY_TEMPLATE = go.layout.Template(
             "#B497D6",
             "#7FD1B9"
         ],
+
     )
+
 )
 
 
 TRAFFIC_COLOR = {
+
     "Jam": "#EF5B5B",
+
     "High": "#F4A261",
+
     "Medium": "#2FBF9F",
+
     "Low": "#5B8DEF"
+
 }
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # DATA LOADING
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 DATA_PATH = os.path.join(
     os.path.dirname(__file__),
@@ -732,25 +1103,38 @@ DATA_PATH = os.path.join(
 )
 def get_data():
 
-    raw = A.load_data(DATA_PATH)
+    raw = A.load_data(
+        DATA_PATH
+    )
 
-    overview = A.data_overview(raw)
+    overview = A.data_overview(
+        raw
+    )
 
-    clean, log = A.clean_data(raw)
+    clean, log = A.clean_data(
+        raw
+    )
 
-    return raw, overview, clean, log
+    return (
+        raw,
+        overview,
+        clean,
+        log
+    )
 
 
 raw_df, overview, df, clean_log = get_data()
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # SIDEBAR
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with st.sidebar:
 
-    st.markdown("### 🛵 RouteWise")
+    st.markdown(
+        "### 🛵 RouteWise"
+    )
 
     st.caption(
         "Food Delivery Analytics Challenge"
@@ -761,73 +1145,141 @@ with st.sidebar:
         unsafe_allow_html=True
     )
 
-    st.markdown("**Filters**")
-
-    cities = st.multiselect(
-        "City type",
-        sorted(df["City"].unique()),
-        default=list(df["City"].unique())
+    st.markdown(
+        "**Filters**"
     )
 
+
+    # CITY
+
+    cities = st.multiselect(
+
+        "City type",
+
+        sorted(
+            df["City"].unique()
+        ),
+
+        default=list(
+            df["City"].unique()
+        )
+
+    )
+
+
+    # WEATHER
+
     weathers = st.multiselect(
+
         "Weather",
-        sorted(df["Weather_conditions"].unique()),
+
+        sorted(
+            df["Weather_conditions"].unique()
+        ),
+
         default=list(
             df["Weather_conditions"].unique()
         )
+
     )
 
+
+    # TRAFFIC
+
     traffics = st.multiselect(
+
         "Traffic density",
+
         sorted(
             df["Road_traffic_density"].unique()
         ),
+
         default=list(
             df["Road_traffic_density"].unique()
         )
+
     )
+
+
+    # FESTIVAL
 
     festival = st.selectbox(
+
         "Festival day?",
-        ["All", "Yes", "No"],
+
+        [
+            "All",
+            "Yes",
+            "No"
+        ],
+
         index=0
+
     )
 
+
+    # DISTANCE
+
     dist_range = st.slider(
+
         "Distance (km)",
-        float(df["distance_km"].min()),
-        float(df["distance_km"].max()),
+
+        float(
+            df["distance_km"].min()
+        ),
+
+        float(
+            df["distance_km"].max()
+        ),
+
         (
-            float(df["distance_km"].min()),
-            float(df["distance_km"].max())
+            float(
+                df["distance_km"].min()
+            ),
+
+            float(
+                df["distance_km"].max()
+            )
         )
+
     )
+
 
     st.markdown(
         '<div class="roadline"></div>',
         unsafe_allow_html=True
     )
 
+
     st.markdown(
         "**AI explanation provider**"
     )
 
+
     provider = st.selectbox(
+
         "Provider",
-        list(AI.PROVIDERS.keys()),
+
+        list(
+            AI.PROVIDERS.keys()
+        ),
+
         index=0,
+
         label_visibility="collapsed"
+
     )
+
 
     st.caption(
-        "Reads the matching API key from environment variables — "
-        "never hard-coded."
+        "Reads the matching API key from environment "
+        "variables or Streamlit secrets."
     )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # APPLY FILTERS
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 f = df[
     df["City"].isin(cities)
@@ -841,6 +1293,7 @@ f = df[
         dist_range[1]
     )
 ]
+
 
 if festival != "All":
 
@@ -858,39 +1311,58 @@ if len(f) == 0:
     st.stop()
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # HERO
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 st.markdown(
-    '<span class="hero-badge">Hackathon Task A · AI &amp; DS</span>',
+
+    '<span class="hero-badge">'
+    'Hackathon Task A · AI &amp; DS'
+    '</span>',
+
     unsafe_allow_html=True
+
 )
 
-st.markdown(
-    '<div class="hero-title">Food Delivery Analytics</div>',
-    unsafe_allow_html=True
-)
 
 st.markdown(
+
+    '<div class="hero-title">'
+    'Food Delivery Analytics'
+    '</div>',
+
+    unsafe_allow_html=True
+
+)
+
+
+st.markdown(
+
     """
     <div class="hero-sub">
         38,964 delivery records, cleaned and analyzed with Pandas —
         turning raw trip data into decisions a delivery business can act on today.
     </div>
     """,
+
     unsafe_allow_html=True
+
 )
+
 
 st.markdown(
+
     '<div class="roadline"></div>',
+
     unsafe_allow_html=True
+
 )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # KPI ROW
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 stats = A.basic_stats(
     f.copy()
@@ -946,6 +1418,7 @@ kpi_defs = [
         "yrs",
         "var(--amber)"
     ),
+
 ]
 
 
@@ -958,11 +1431,17 @@ for i, (c, item) in enumerate(
 
     icon, label, num, unit, accent = item
 
+
     unit_html = (
+
         f'<span class="kpi-unit">{unit}</span>'
+
         if unit
+
         else ""
+
     )
+
 
     c.markdown(
 
@@ -997,15 +1476,16 @@ for i, (c, item) in enumerate(
         """,
 
         unsafe_allow_html=True
+
     )
 
 
 st.write("")
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TABS
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 (
     tab_overview,
@@ -1026,16 +1506,20 @@ st.write("")
         "🤖 AI Explanation",
         "💬 RouteWise Chatbot"
     ]
+
 )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: OVERVIEW
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_overview:
 
-    c1, c2 = st.columns([1.1, 1])
+    c1, c2 = st.columns(
+        [1.1, 1]
+    )
+
 
     with c1:
 
@@ -1043,16 +1527,21 @@ with tab_overview:
             "Dataset overview"
         )
 
+
         st.write(
+
             f"**{overview['n_rows']:,} rows × "
             f"{overview['n_cols']} columns**, "
             f"**{overview['duplicate_rows']}** "
             f"duplicate rows found."
+
         )
+
 
         dtype_df = pd.DataFrame({
 
-            "column": overview["columns"],
+            "column":
+                overview["columns"],
 
             "dtype": [
                 overview["dtypes"][c]
@@ -1071,10 +1560,15 @@ with tab_overview:
 
         })
 
+
         st.dataframe(
+
             dtype_df,
+
             height=380,
+
             width="stretch"
+
         )
 
 
@@ -1083,6 +1577,7 @@ with tab_overview:
         st.subheader(
             "Cleaning decisions"
         )
+
 
         st.markdown(
 
@@ -1119,6 +1614,7 @@ with tab_overview:
 
             Full rationale is in **README.md**.
             """
+
         )
 
 
@@ -1126,28 +1622,36 @@ with tab_overview:
         "Preview of cleaned data"
     )
 
+
     st.dataframe(
         f.head(20),
         width="stretch"
     )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: Q1 TRAFFIC
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_q1:
 
     st.subheader(
+
         "Q1 — Which road traffic condition has the highest "
         "average delivery time?"
+
     )
 
-    q1 = A.q1_traffic_impact(f)
+
+    q1 = A.q1_traffic_impact(
+        f
+    )
+
 
     worst = q1.index[0]
 
     worst_v = q1.iloc[0]
+
 
     st.markdown(
 
@@ -1165,6 +1669,7 @@ with tab_q1:
         """,
 
         unsafe_allow_html=True
+
     )
 
 
@@ -1188,43 +1693,68 @@ with tab_q1:
         color_discrete_map=TRAFFIC_COLOR,
 
         text=q1.values
+
     )
 
 
     fig.update_traces(
+
         texttemplate="%{text:.1f}",
+
         textposition="outside",
+
         showlegend=False
+
     )
+
 
     fig.update_layout(
-        title="Average delivery time by traffic density",
+
+        title=
+            "Average delivery time by traffic density",
+
         height=460
+
     )
+
 
     st.plotly_chart(
+
         fig,
+
         width="stretch"
+
     )
+
 
     st.download_button(
+
         "⬇ Download this chart as HTML",
+
         fig.to_html(),
+
         "chart1_traffic.html"
+
     )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: Q2 DISTANCE
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_q2:
 
     st.subheader(
+
         "Q2 — How does delivery distance affect delivery time?"
+
     )
 
-    q2 = A.q2_distance_impact(f)
+
+    q2 = A.q2_distance_impact(
+        f
+    )
+
 
     st.markdown(
 
@@ -1235,12 +1765,13 @@ with tab_q2:
             <b>{q2["correlation"]}</b>.
 
             Delivery time <b>increases</b> as distance increases,
-            most sharply up to ~10-15 km before leveling off.
+            most sharply up to 10-15 km before leveling off.
 
         </div>
         """,
 
         unsafe_allow_html=True
+
     )
 
 
@@ -1250,9 +1781,16 @@ with tab_q2:
     with c1:
 
         sample = f.sample(
-            min(4000, len(f)),
+
+            min(
+                4000,
+                len(f)
+            ),
+
             random_state=42
+
         )
+
 
         fig2 = px.scatter(
 
@@ -1271,26 +1809,45 @@ with tab_q2:
             trendline_color_override="#EF5B5B",
 
             labels={
-                "distance_km": "Distance (km)",
-                "Time_taken (min)": "Delivery time (min)"
+                "distance_km":
+                    "Distance (km)",
+
+                "Time_taken (min)":
+                    "Delivery time (min)"
             }
+
         )
+
 
         fig2.update_traces(
+
             marker=dict(
+
                 color="#2FBF9F",
+
                 size=5
+
             )
+
         )
+
 
         fig2.update_layout(
-            title="Distance vs. delivery time",
+
+            title=
+                "Distance vs. delivery time",
+
             height=430
+
         )
 
+
         st.plotly_chart(
+
             fig2,
+
             width="stretch"
+
         )
 
 
@@ -1299,6 +1856,7 @@ with tab_q2:
         bucket = q2[
             "avg_time_by_distance_bucket"
         ]
+
 
         fig3 = px.bar(
 
@@ -1311,12 +1869,17 @@ with tab_q2:
             template=PLOTLY_TEMPLATE,
 
             labels={
-                "x": "Distance bucket",
-                "y": "Avg delivery time (min)"
+                "x":
+                    "Distance bucket",
+
+                "y":
+                    "Avg delivery time (min)"
             },
 
             text=bucket.values
+
         )
+
 
         fig3.update_traces(
 
@@ -1325,53 +1888,81 @@ with tab_q2:
             texttemplate="%{text:.1f}",
 
             textposition="outside"
+
         )
+
 
         fig3.update_layout(
 
-            title="Average time by distance bucket",
+            title=
+                "Average time by distance bucket",
 
             height=430
+
         )
+
 
         st.plotly_chart(
+
             fig3,
+
             width="stretch"
+
         )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: Q3 COMBINED CONDITIONS
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_q3:
 
     st.subheader(
+
         "Q3 — Which weather × traffic combination is slowest?"
+
     )
 
+
     pivot = (
+
         f.groupby(
+
             [
                 "Weather_conditions",
                 "Road_traffic_density"
             ],
+
             observed=True
+
         )["Time_taken (min)"]
+
         .mean()
+
         .round(2)
+
         .unstack()
+
     )
+
 
     top = A.q3_combined_conditions(
+
         f,
+
         top_n=1
+
     )
 
+
     (w, t), v = (
+
         top.index[0],
+
         top.iloc[0]
+
     )
+
 
     st.markdown(
 
@@ -1388,6 +1979,7 @@ with tab_q3:
         """,
 
         unsafe_allow_html=True
+
     )
 
 
@@ -1400,24 +1992,33 @@ with tab_q3:
         color_continuous_scale="Sunsetdark",
 
         labels={
-            "color": "Avg min"
+            "color":
+                "Avg min"
         },
 
         aspect="auto"
+
     )
+
 
     fig4.update_layout(
 
         template=PLOTLY_TEMPLATE,
 
-        title="Average delivery time (min): weather × traffic",
+        title=
+            "Average delivery time (min): weather × traffic",
 
         height=480
+
     )
 
+
     st.plotly_chart(
+
         fig4,
+
         width="stretch"
+
     )
 
 
@@ -1425,11 +2026,15 @@ with tab_q3:
         "Top 5 slowest combinations"
     )
 
+
     st.dataframe(
 
         A.q3_combined_conditions(
+
             f,
+
             top_n=5
+
         )
         .rename(
             "avg_minutes"
@@ -1437,12 +2042,13 @@ with tab_q3:
         .reset_index(),
 
         width="stretch"
+
     )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: BUSINESS INSIGHTS
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_insights:
 
@@ -1450,11 +2056,15 @@ with tab_insights:
         "💡 Business insights"
     )
 
+
     insights = A.business_insights(
         f.copy()
     )
 
-    for i, ins in enumerate(insights):
+
+    for i, ins in enumerate(
+        insights
+    ):
 
         st.markdown(
 
@@ -1484,12 +2094,13 @@ with tab_insights:
             """,
 
             unsafe_allow_html=True
+
         )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: AI EXPLANATION
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_ai:
 
@@ -1497,31 +2108,50 @@ with tab_ai:
         "🤖 AI-generated business explanation"
     )
 
+
     st.caption(
+
         "Python/Pandas already computed every number below — "
         "the model only turns them into plain-English narrative."
+
     )
 
 
     if st.button(
+
         "✨ Generate explanation",
-        type="primary"
+
+        type="primary",
+
+        key="generate_ai_explanation"
+
     ):
 
         insights = A.business_insights(
             f.copy()
         )
 
+
         q1d = (
+
             A.q1_traffic_impact(f)
+
             .to_dict()
+
         )
 
-        q2d = A.q2_distance_impact(f)
+
+        q2d = A.q2_distance_impact(
+            f
+        )
+
 
         q3d = (
+
             A.q3_combined_conditions(f)
+
             .to_dict()
+
         )
 
 
@@ -1534,6 +2164,7 @@ with tab_ai:
                 q2d[
                     "avg_time_by_distance_bucket"
                 ].to_dict()
+
         }
 
 
@@ -1556,13 +2187,18 @@ with tab_ai:
                     insights,
 
                     provider=provider
+
                 )
 
 
             paragraphs = [
+
                 p.strip()
+
                 for p in text.strip().split("\n")
+
                 if p.strip()
+
             ]
 
 
@@ -1582,6 +2218,7 @@ with tab_ai:
                 for i, p in enumerate(
                     paragraphs
                 )
+
             )
 
 
@@ -1620,6 +2257,7 @@ with tab_ai:
                 """,
 
                 unsafe_allow_html=True
+
             )
 
 
@@ -1637,18 +2275,25 @@ with tab_ai:
     else:
 
         st.info(
+
             "Click the button to call the LLM API "
             "with the computed statistics."
+
         )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # TAB: ROUTEWISE AI CHATBOT
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 with tab_chat:
 
+    # ========================================================
+    # CHAT HEADER
+    # ========================================================
+
     st.markdown(
+
         """
         <div class="chat-header">
 
@@ -1664,35 +2309,45 @@ with tab_chat:
         """,
 
         unsafe_allow_html=True
+
     )
 
 
+    # ========================================================
+    # CHAT INFO
+    # ========================================================
+
     st.markdown(
+
         """
         <div class="chat-info">
 
-            📊 The chatbot uses the <b>currently filtered dashboard data</b>.
-            Change the filters from the sidebar and ask again for updated analysis.
+            📊 The chatbot uses the
+            <b>currently filtered dashboard data</b>.
+
+            Change the filters from the sidebar and ask again
+            for updated analysis.
 
         </div>
         """,
 
         unsafe_allow_html=True
+
     )
 
 
-    # ----------------------------------------------------------------------- #
-    # CHAT SESSION
-    # ----------------------------------------------------------------------- #
+    # ========================================================
+    # SESSION STATE
+    # ========================================================
 
     if "routewise_chat" not in st.session_state:
 
         st.session_state.routewise_chat = []
 
 
-    # ----------------------------------------------------------------------- #
-    # CLEAR CHAT
-    # ----------------------------------------------------------------------- #
+    # ========================================================
+    # CLEAR CHAT + STATUS
+    # ========================================================
 
     clear_col, status_col = st.columns(
         [1, 4]
@@ -1702,8 +2357,11 @@ with tab_chat:
     with clear_col:
 
         if st.button(
+
             "🗑️ Clear Chat",
+
             key="clear_routewise_chat"
+
         ):
 
             st.session_state.routewise_chat = []
@@ -1714,18 +2372,21 @@ with tab_chat:
     with status_col:
 
         st.caption(
-            f"📦 Analyzing {len(f):,} currently filtered deliveries"
+
+            f"📦 Analyzing "
+            f"{len(f):,} currently filtered deliveries"
+
         )
 
+
+    # ========================================================
+    # EXAMPLE QUESTIONS
+    # ========================================================
 
     st.markdown(
         "### 💡 Try asking"
     )
 
-
-    # ----------------------------------------------------------------------- #
-    # EXAMPLE QUESTIONS
-    # ----------------------------------------------------------------------- #
 
     examples = [
 
@@ -1743,31 +2404,37 @@ with tab_chat:
 
 
     example_cols = st.columns(
-        5
+        2
     )
 
 
-    for col, question in zip(
-        example_cols,
+    for i, question in enumerate(
         examples
     ):
 
-        with col:
+        with example_cols[i % 2]:
 
             if st.button(
+
                 question,
-                key=f"example_{question}"
+
+                key=f"example_{i}",
+
+                use_container_width=True
+
             ):
 
                 st.session_state.routewise_question = question
+
+                st.rerun()
 
 
     st.write("")
 
 
-    # ----------------------------------------------------------------------- #
+    # ========================================================
     # DISPLAY CHAT HISTORY
-    # ----------------------------------------------------------------------- #
+    # ========================================================
 
     for message in st.session_state.routewise_chat:
 
@@ -1780,55 +2447,68 @@ with tab_chat:
             )
 
 
-    # ----------------------------------------------------------------------- #
+    # ========================================================
     # CHAT INPUT
-    # ----------------------------------------------------------------------- #
+    # ========================================================
 
     user_question = st.chat_input(
+
         "Ask RouteWise about your delivery data..."
+
     )
 
 
-    # Example button question
+    # ========================================================
+    # EXAMPLE QUESTION
+    # ========================================================
 
     if "routewise_question" in st.session_state:
 
         user_question = (
+
             st.session_state.pop(
                 "routewise_question"
             )
+
         )
 
 
-    # ----------------------------------------------------------------------- #
+    # ========================================================
     # PROCESS QUESTION
-    # ----------------------------------------------------------------------- #
+    # ========================================================
 
     if user_question:
 
+        # ----------------------------------------------------
         # Save user question
+        # ----------------------------------------------------
 
-        st.session_state.routewise_chat.append({
+        st.session_state.routewise_chat.append(
 
-            "role": "user",
+            {
+                "role": "user",
+                "content": user_question
+            }
 
-            "content": user_question
-
-        })
+        )
 
 
-        # Display user message
+        # ----------------------------------------------------
+        # Display user question
+        # ----------------------------------------------------
 
-        with st.chat_message("user"):
+        with st.chat_message(
+            "user"
+        ):
 
             st.markdown(
                 user_question
             )
 
 
-        # ------------------------------------------------------------------- #
-        # CALCULATE CURRENT ANALYTICS
-        # ------------------------------------------------------------------- #
+        # ----------------------------------------------------
+        # CURRENT ANALYTICS
+        # ----------------------------------------------------
 
         insights = A.business_insights(
             f.copy()
@@ -1836,8 +2516,11 @@ with tab_chat:
 
 
         q1_data = (
+
             A.q1_traffic_impact(f)
+
             .to_dict()
+
         )
 
 
@@ -1860,19 +2543,27 @@ with tab_chat:
 
 
         q3_data = (
+
             A.q3_combined_conditions(
+
                 f,
+
                 top_n=10
+
             )
+
             .to_dict()
+
         )
 
 
-        # ------------------------------------------------------------------- #
+        # ----------------------------------------------------
         # ASK AI
-        # ------------------------------------------------------------------- #
+        # ----------------------------------------------------
 
-        with st.chat_message("assistant"):
+        with st.chat_message(
+            "assistant"
+        ):
 
             with st.spinner(
                 "🤖 RouteWise AI is analyzing..."
@@ -1894,52 +2585,66 @@ with tab_chat:
 
                         insights=insights,
 
-                        provider=provider,
-
-                        chat_history=
-                            st.session_state.routewise_chat
+                        provider=provider
 
                     )
 
+
+                    # ----------------------------------------
+                    # Display answer
+                    # ----------------------------------------
 
                     st.markdown(
                         answer
                     )
 
 
-                    # Save assistant answer
+                    # ----------------------------------------
+                    # Save answer
+                    # ----------------------------------------
 
-                    st.session_state.routewise_chat.append({
+                    st.session_state.routewise_chat.append(
 
-                        "role": "assistant",
+                        {
+                            "role": "assistant",
+                            "content": answer
+                        }
 
-                        "content": answer
-
-                    })
+                    )
 
 
                 except Exception as e:
 
                     st.error(
-                        "Sorry, I couldn't connect to the AI service. "
-                        "Please check your API key and try again."
+
+                        "Sorry, I couldn't connect to "
+                        "the AI service. Please check "
+                        "your API key and try again."
+
                     )
+
 
                     st.code(
                         str(e)
                     )
 
 
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 # FOOTER
-# --------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------
 
 st.markdown(
+
     '<div class="roadline"></div>',
+
     unsafe_allow_html=True
+
 )
 
+
 st.caption(
+
     "Built with Pandas, Plotly & Streamlit · "
     "Food Delivery Analytics Challenge"
+
 )
